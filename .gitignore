@@ -1,0 +1,5 @@
+FilesNano_cff.sh
+JobsNano_cff.py
+HistNano/*.root
+HistNano/condor/tmpSub/
+HistNano/src/*.o
