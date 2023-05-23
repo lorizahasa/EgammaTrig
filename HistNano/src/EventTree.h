@@ -36,11 +36,11 @@ class EventTree{
     Int_t           eleID[100];
     Float_t         eleMiniPFRelIso[100];
 
-    Int_t          nTrigObj;
+    Int_t           nTrigObj;
     Float_t         TrigObj_pt[100];   
     Float_t         TrigObj_eta[100];   
     Float_t         TrigObj_phi[100];  
-    Int_t           TrigObj_id[100];   
+    UShort_t        TrigObj_id[100];   
     Int_t           TrigObj_filterBits[100];   
 };
 #endif

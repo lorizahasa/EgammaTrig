@@ -6,16 +6,16 @@ import ctypes
 #-----------------------------------------
 #Get, add, substract histograms 
 #-----------------------------------------
-def getEff(inFile, var):
+def getEff(inFile, var, name):
     try:
         hPass = inFile.Get("probe%sPass"%var)
         hAll  = inFile.Get("probe%s"%var)
-        hEff  = hPass.Clone("hEff")
-        hEff.Divide(hAll)
+        hEff_  = hPass.Clone("hEff_%s"%name)
+        hEff_.Divide(hAll)
     except Exception:
         print ("Error: Hist not found. \nFile: %s \nHistName: %s"%(inFile, hPath))
         sys.exit()
-    return hEff
+    return hEff_
 
 #-----------------------------------------
 #Decorate a histogram
@@ -86,6 +86,8 @@ def getLumiLabel(year):
         lumi = "59.8 fb^{-1} (2018)"
     if "__" in year:
         lumi = "138 fb^{-1} (Run2)"
+    if "2023" in year:
+        lumi = "X fb^{-1} (2023)"
     return lumi
 
 def getChLabel(decay, channel):

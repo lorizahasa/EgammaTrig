@@ -21,5 +21,5 @@ forRatio.append(["2023C_EGamma0", "2023C_EGamma1"])
 
 xVars = []
 xVars.append("Pt")
-xVars.append("Eta")
+#xVars.append("Eta")
 

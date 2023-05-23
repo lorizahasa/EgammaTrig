@@ -16,6 +16,8 @@ ModTDRStyle()
 xPadRange = [0.0,1.0]
 yPadRange = [0.0,0.30-padGap, 0.30+padGap,1.0]
 
+os.system("mkdir -p /eos/uscms/%s"%outPlotDir)
+
 for var in xVars:
     gROOT.SetBatch(True)
     canvas = TCanvas()
@@ -30,37 +32,45 @@ for var in xVars:
         gPad.RedrawAxis();
     else:
         canvas.cd()
-    index = 0
+
+    #get files
+    files = []
     for ys in list(forOverlay.keys()):
-        print(ys)
         year = forOverlay[ys][0]
         samp = forOverlay[ys][1]
         inHistDir  = "/eos/uscms/%s/%s/merged"%(outDir, year)
-        inFile = TFile("%s/%s.root"%(inHistDir, samp), "read")
-        os.system("mkdir -p /eos/uscms/%s"%outPlotDir)
+        inFile = TFile.Open("%s/%s.root"%(inHistDir, samp))
+        files.append(inFile)
 
-        hEff   = getEff(inFile, var)
-        hEff.SetLineColor(index+1)
-
-        plotLegend = TLegend(0.65,0.40,0.95,0.88); 
-        decoLegend(plotLegend, 4, 0.035)
-        plotLegend.AddEntry(hEff, "%s__%s"%(year, samp))
-        if index==0:
-            hEff.Draw("HIST")
-        else:
-            hEff.Draw("hist same")
-        index =+1
-        plotLegend.Draw()
-        lumi_13TeV = getLumiLabel(year)
+    #get effs 
+    effs = []
+    for f in files: 
+        hEff   = getEff(f, var, "2023C")
+        effs.append(hEff)
+    
+    #plot effs
+    leg = TLegend(0.55,0.40,0.95,0.50); 
+    decoLegend(leg, 4, 0.030)
+    index = 0
+    for eff in effs: 
         xTitle = var
         yTitle = "Efficiency"
-        hEff.SetMaximum(1.3*hEff.GetMaximum())
-        hEff.GetXaxis().SetTitle(xTitle)
-        hEff.GetYaxis().SetTitle(yTitle)
+        eff.GetXaxis().SetTitle(xTitle)
+        eff.GetYaxis().SetTitle(yTitle)
+        eff.SetLineColor(index+1)
+        eff.SetMaximum(1.3*eff.GetMaximum())
+        if index==0:
+            eff.Draw("HIST")
+        else:
+            eff.Draw("hist same")
+        index =+1
+        leg.AddEntry(eff, "%s"%(eff.GetName()), "PL")
     
-        #Draw CMS, Lumi, channel
-        extraText  = "Preliminary"
-        CMS_lumi(lumi_13TeV, canvas, iPeriod, iPosX, extraText)
+    #Draw CMS, Lumi, channel
+    extraText  = "Preliminary"
+    lumi_13TeV = getLumiLabel(year)
+    CMS_lumi(lumi_13TeV, canvas, iPeriod, iPosX, extraText)
+    leg.Draw()
     
     #Ratio lots
     if len(forRatio)>0: 
@@ -79,12 +89,12 @@ for var in xVars:
             inFile1 = TFile("%s/%s.root"%(inHistDir1, ys1[1]), "read")
             inHistDir2  = "/eos/uscms/%s/%s/merged"%(outDir, ys2[0])
             inFile2 = TFile("%s/%s.root"%(inHistDir2, ys2[1]), "read")
-            hEff1   = getEff(inFile1, var)
-            hEff2   = getEff(inFile2, var)
+            hEff1   = getEff(inFile1, var, "aa")
+            hEff2   = getEff(inFile2, var, "bb")
             hRatio = hEff1.Clone("Ratio")
             hRatio.Divide(hEff2)
             decoHistRatio(hRatio, xTitle, "Ratio", index_+1)
-            hRatio.GetYaxis().SetRangeUser(0.9, 1.1)
+            hRatio.GetYaxis().SetRangeUser(0.7, 1.3)
             if index_==0:
                 hRatio.Draw("HIST")
             else:
@@ -93,5 +103,5 @@ for var in xVars:
         baseLine = TF1("baseLine","1", -100, 10000);
         baseLine.SetLineColor(3);
         baseLine.Draw("SAME");
-        pdf = "/eos/uscms/%s/eff_%s.pdf"%(outPlotDir, var)
-        canvas.SaveAs(pdf)
+    pdf = "/eos/uscms/%s/eff_%s.pdf"%(outPlotDir, var)
+    canvas.SaveAs(pdf)

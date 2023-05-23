@@ -145,8 +145,10 @@ int main(int ac, char** av){
         if(tree->nTrigObj < 2) continue;
 
         // Randomly we chose electrons out of two and do matching with trigObj
-        int e1 = rand()%2;
-        int e2 = (e1+1)%2;
+        int ind0 = rand()%2;
+        int ind1 = (ind0+1)%2;
+        int e1   = selEles[ind0];
+        int e2   = selEles[ind1];
         bool tagMatch=selector->isTrigMatched(tree, e1);
         bool probeMatch=selector->isTrigMatched(tree, e2);
 

@@ -61,8 +61,8 @@ bool Selector::isTrigMatched(EventTree *tree, int ind){
     for(int j=0;j<tree->nTrigObj;j++){
         double dR = deltaR(tree->eleEta[ind],  tree->elePhi[ind], tree->TrigObj_eta[j], tree->TrigObj_phi[j]);
         // filterbit 2 is for hltEle32WPTightGsfTrackIsoFilter (of HLT_ELe32_WPTight_Gsf) 
-        //std::cout<<dR<<", "<<tree->TrigObj_pt[j]<<", "<<abs(tree->TrigObj_id[j])<<", "<<tree->TrigObj_filterBits[j]<<std::endl;
-        if(dR <0.1 && tree->TrigObj_pt[j]>32 && abs(tree->TrigObj_id[j])==11  && (tree->TrigObj_filterBits[j] & 2)==2) isMatch = true; 
+        //std::cout<<ind<<", "<<dR<<", "<<tree->TrigObj_pt[j]<<", "<<abs(tree->TrigObj_id[j])<<", "<<tree->TrigObj_filterBits[j]<<std::endl;
+        if(dR <0.1 && tree->TrigObj_pt[j]>32 && abs(tree->TrigObj_id[j])==11  && (tree->TrigObj_filterBits[j] & 1)) isMatch = true; 
     }
     return isMatch;
 }
