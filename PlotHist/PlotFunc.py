@@ -10,12 +10,26 @@ def getEff(inFile, var, name):
     try:
         hPass = inFile.Get("probe%sPass"%var)
         hAll  = inFile.Get("probe%s"%var)
-        hEff_  = hPass.Clone("hEff_%s"%name)
+        hEff_  = hPass.Clone("%s"%name)
         hEff_.Divide(hAll)
     except Exception:
         print ("Error: Hist not found. \nFile: %s \nHistName: %s"%(inFile, hPath))
         sys.exit()
     return hEff_
+
+#-----------------------------------------
+#Get ratio of two eff histograms
+#-----------------------------------------
+def getRatio(files, var):
+    effs  = []
+    names = []
+    for name, f in files.items():
+        names.append(name)
+        effs.append(getEff(f, var, name))
+    rName  = "%s_vs_%s"%(names[0], names[1])
+    hRatio = effs[0].Clone(rName)
+    hRatio.Divide(effs[1])
+    return hRatio
 
 #-----------------------------------------
 #Decorate a histogram
@@ -75,7 +89,7 @@ def decoLegend(legend, nCol, textSize):
     return legend
 
 def getLumiLabel(year):
-    lumi = "35.9 fb^{-1}"
+    lumi = "X fb^{-1}"
     if "16Pre" in year:
         lumi = "19.5 fb^{-1} (2016Pre)"
     if "16Post" in year:

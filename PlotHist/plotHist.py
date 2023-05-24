@@ -34,40 +34,38 @@ for var in xVars:
         canvas.cd()
 
     #get files
-    files = []
-    for ys in list(forOverlay.keys()):
-        year = forOverlay[ys][0]
-        samp = forOverlay[ys][1]
-        inHistDir  = "/eos/uscms/%s/%s/merged"%(outDir, year)
-        inFile = TFile.Open("%s/%s.root"%(inHistDir, samp))
-        files.append(inFile)
+    files = {}
+    for samp in forOverlay:
+        inFile = TFile.Open("/eos/uscms/%s/merged/%s_Hist.root"%(outDir, samp))
+        files[samp] = inFile
 
     #get effs 
     effs = []
-    for f in files: 
-        hEff   = getEff(f, var, "2023C")
-        effs.append(hEff)
-    
+    for name, f in files.items(): 
+        eff   = getEff(f, var, name)
+        effs.append(eff)
+
     #plot effs
     leg = TLegend(0.55,0.40,0.95,0.50); 
     decoLegend(leg, 4, 0.030)
-    index = 0
-    for eff in effs: 
+    for index, eff in enumerate(effs): 
         xTitle = var
         yTitle = "Efficiency"
         eff.GetXaxis().SetTitle(xTitle)
         eff.GetYaxis().SetTitle(yTitle)
         eff.SetLineColor(index+1)
-        eff.SetMaximum(1.3*eff.GetMaximum())
+        eff.SetMaximum(1.2)
+        eff.SetMinimum(0.1)
+        #eff.SetMaximum(1.3*eff.GetMaximum())
         if index==0:
             eff.Draw("HIST")
         else:
             eff.Draw("hist same")
-        index =+1
-        leg.AddEntry(eff, "%s"%(eff.GetName()), "PL")
+        leg.AddEntry(eff, "%s"%(eff.GetName()), "L")
     
     #Draw CMS, Lumi, channel
     extraText  = "Preliminary"
+    year = "XYZ"
     lumi_13TeV = getLumiLabel(year)
     CMS_lumi(lumi_13TeV, canvas, iPeriod, iPosX, extraText)
     leg.Draw()
@@ -81,27 +79,24 @@ for var in xVars:
         #gPad.SetTickx(0);
         gPad.SetPad(xPadRange[0],yPadRange[0],xPadRange[1],yPadRange[2]);
         gPad.RedrawAxis();
-        index_ = 0
-        for two in forRatio:
-            ys1 = forOverlay[two[0]]
-            ys2 = forOverlay[two[1]]
-            inHistDir1  = "/eos/uscms/%s/%s/merged"%(outDir, ys1[0])
-            inFile1 = TFile("%s/%s.root"%(inHistDir1, ys1[1]), "read")
-            inHistDir2  = "/eos/uscms/%s/%s/merged"%(outDir, ys2[0])
-            inFile2 = TFile("%s/%s.root"%(inHistDir2, ys2[1]), "read")
-            hEff1   = getEff(inFile1, var, "aa")
-            hEff2   = getEff(inFile2, var, "bb")
-            hRatio = hEff1.Clone("Ratio")
-            hRatio.Divide(hEff2)
+        rLeg = TLegend(0.25,0.75,0.95,0.85); 
+        decoLegend(rLeg, 4, 0.085)
+        baseLine = TF1("baseLine","1", -100, 10000);
+        baseLine.SetLineColor(3);
+        #baseLine.Draw()
+        for index_, two in enumerate(forRatio):
+            files = {}
+            for samp in two:
+                inFile = TFile.Open("/eos/uscms/%s/merged/%s_Hist.root"%(outDir, samp))
+                files[samp] = inFile
+            hRatio = getRatio(files, var)
             decoHistRatio(hRatio, xTitle, "Ratio", index_+1)
             hRatio.GetYaxis().SetRangeUser(0.7, 1.3)
             if index_==0:
                 hRatio.Draw("HIST")
             else:
                 hRatio.Draw("hist same")
-            index_=+1
-        baseLine = TF1("baseLine","1", -100, 10000);
-        baseLine.SetLineColor(3);
-        baseLine.Draw("SAME");
+            rLeg.AddEntry(hRatio, "%s"%(hRatio.GetName()), "L")
+        rLeg.Draw()
     pdf = "/eos/uscms/%s/eff_%s.pdf"%(outPlotDir, var)
     canvas.SaveAs(pdf)

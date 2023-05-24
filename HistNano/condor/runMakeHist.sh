@@ -24,17 +24,16 @@ fi
 #Run for Base, Signal region
 echo "All arguements: "$@
 echo "Number of arguements: "$#
-year=$1
-sample=$2
-job=$3
-nJobTotal=$4
-outDir=$5
-varname=${sample}_FileList_${year}
+sample=$1
+job=$2
+nJobTotal=$3
+outDir=$4
+varname=${sample}_FileList
 source FilesNano_cff.sh
 cd HistNano
 jobNum="${job}of${nJobTotal}"
-echo "./makeHist ${year} ${jobNum} ${sample}_Hist.root ${!varname}"
-./makeHist ${year} $jobNum ${sample}_Hist.root ${!varname}
+echo "./makeHist ${jobNum} ${sample}_Hist.root ${!varname}"
+./makeHist 2010 $jobNum ${sample}_Hist.root ${!varname}
 
 printf "Done skimming at ";/bin/date
 #---------------------------------------------

@@ -7,7 +7,7 @@ sys.dont_write_bytecode = True
 sys.path.insert(0, os.getcwd().replace("condor",""))
 sys.path.insert(0, os.getcwd().replace("HistNano/condor",""))
 from Inputs import *
-from JobsNano_cff import Samples_2023C 
+from JobsNano_cff import * 
 
 if not os.path.exists("tmpSub/log"):
     os.makedirs("tmpSub/log")
@@ -15,7 +15,8 @@ condorLogDir = "log"
 tarFile = "tmpSub/EgammaNanoTnP.tar.gz"
 if os.path.exists(tarFile):
 	os.system("rm %s"%tarFile)
-os.system("tar -zcvf %s --exclude=../../../EgammaNanoTnP/.git/ --exclude=../../HistNano/condor ../../../EgammaNanoTnP "%tarFile)
+os.system("tar --exclude=../../../EgammaNanoTnP/.git/ -zcvf %s  ../../../EgammaNanoTnP "%tarFile)
+#os.system("tar -zcvf %s --exclude=../../../EgammaNanoTnP/.git/ --exclude=../../HistNano/condor ../../../EgammaNanoTnP "%tarFile)
 os.system("cp runMakeHist.sh tmpSub/")
 common_command = \
 'Universe   = vanilla\n\
@@ -31,24 +32,17 @@ Log    = %s/log_$(cluster)_$(process).condor\n\n'%(condorLogDir, condorLogDir, c
 #----------------------------------------
 #Create jdl files
 #----------------------------------------
-subFile = open('tmpSub/condorSubmit.sh','w')
-for year in Years: 
-    samples = eval("Samples_%s"%year)
-    jdlName = 'submitJobs_%s.jdl'%(year)
-    jdlFile = open('tmpSub/%s'%jdlName,'w')
-    jdlFile.write('Executable =  runMakeHist.sh \n')
-    jdlFile.write(common_command)
-    outDir="%s/%s"%(outDir, year)
-    os.system("eos root://cmseos.fnal.gov mkdir -p %s"%outDir) 
-    jdlFile.write("X=$(step)+1\n")
-    
-    for sampleName, nJobEvt in samples.items():
-        nJob = nJobEvt[0]
-        args =  'Arguments  = %s %s $INT(X) %i %s\n' %(year, sampleName, nJob, outDir)
-        args += "Queue %i\n\n"%nJob
-        jdlFile.write(args)
-    
-    subFile.write("condor_submit %s\n"%jdlName)
-	#print "condor_submit jdl/%s"%jdlFile
-    jdlFile.close() 
-subFile.close()
+jdlName = 'submitJobs.jdl'
+jdlFile = open('tmpSub/%s'%jdlName,'w')
+jdlFile.write('Executable =  runMakeHist.sh \n')
+jdlFile.write(common_command)
+os.system("eos root://cmseos.fnal.gov mkdir -p %s"%outDir) 
+jdlFile.write("X=$(step)+1\n")
+
+for name in samples.keys():
+    samp = eval("Sample_%s"%name)
+    nJob = samp[name][0]
+    args =  'Arguments  = %s $INT(X) %i %s\n' %(name, nJob, outDir)
+    args += "Queue %i\n\n"%nJob
+    jdlFile.write(args)
+jdlFile.close() 

@@ -25,8 +25,19 @@ class EventTree{
     UInt_t    lumis_;
     bool isData_;
     
-    // Electron
+    // variables
+    // for 2022G 
+    /*
+    UInt_t          nEle;
+    UInt_t          nTrigObj;
+    Int_t           TrigObj_id[100];   
+    */
+    // for 2023C 
     Int_t           nEle;
+    Int_t           nTrigObj;
+    UShort_t        TrigObj_id[100];   
+
+
     Float_t         elePhi[100];
     Float_t         elePt[100];
     Float_t         eleEta[100];
@@ -36,11 +47,9 @@ class EventTree{
     Int_t           eleID[100];
     Float_t         eleMiniPFRelIso[100];
 
-    Int_t           nTrigObj;
     Float_t         TrigObj_pt[100];   
     Float_t         TrigObj_eta[100];   
     Float_t         TrigObj_phi[100];  
-    UShort_t        TrigObj_id[100];   
     Int_t           TrigObj_filterBits[100];   
 };
 #endif
