@@ -39,7 +39,7 @@ if __name__=="__main__":
             continue
         nFiles = len(fileList.split(" "))
         evt     = getEvents(sample)
-        evtPerJob = 2e6 #2 million
+        evtPerJob = 1e6 #2 million
         nJob = int(np.ceil(evt/evtPerJob))
         if nFiles<nJob: 
             nJob = nFiles

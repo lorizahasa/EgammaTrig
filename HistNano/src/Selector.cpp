@@ -6,27 +6,19 @@ Selector::Selector(){
 std::vector<int> Selector::filter_electrons(EventTree *tree){
     std::vector<int> selEles_;
     for(int eleInd = 0; eleInd < tree->nEle; ++eleInd){
-        double eta = tree->eleEta[eleInd];
-        double absEta = TMath::Abs(eta);
-        double SCeta = eta + tree->eleDeltaEtaSC[eleInd];
-        double absSCEta = TMath::Abs(SCeta);
+        double absEta = TMath::Abs(tree->eleEta[eleInd]);
         double pt = tree->elePt[eleInd];
-        // make sure it doesn't fall within the gap
-        bool passEtaEBEEGap = (absSCEta < 1.4442) || (absSCEta > 1.566);
-
-        Int_t eleID = tree->eleID[eleInd];
-        bool passVetoID  = (eleID==1); 
-        bool passTightID = (eleID==4);
-
+        bool passEtaEBEEGap = (absEta < 1.4442) || (absEta > 1.566);
+        bool passTightID = (tree->eleID[eleInd] ==4);
+        //select electrons
         bool eleSel = (passEtaEBEEGap && 
-                       absEta <= 2.4 &&
+                       absEta <= 2.5 &&
                        pt >= 32.0 &&
                        passTightID);
         if(eleSel) selEles_.push_back(eleInd);
     }
     return selEles_;
 }
-
 
 bool Selector::filter_Z(EventTree *tree, vector<int> selEles__){
     bool passZ = true;

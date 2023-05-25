@@ -1,7 +1,7 @@
 import sys
 sys.dont_write_bytecode = True
 
-outDir="/store/user/lpctop/Output/EgammaNanoTnP/HistNano"
+outDir="/store/user/lpctop/Output/EgammaNanoTnP/HistNano2"
 
 
 # for condor jobs
@@ -16,7 +16,7 @@ combSamp["EGamma_Run2023C"] = ["EGamma0_Run2023C", "EGamma1_Run2023C"]
 
 
 #For plotting efficiency
-outPlotDir ="/store/user/lpctop/Output/EgammaNanoTnP/PlotHist"
+outPlotDir ="/store/user/lpctop/Output/EgammaNanoTnP/PlotHist2"
 forOverlay = []
 forOverlay.append("EGamma_Run2022G")
 #forOverlay.append("EGamma0_Run2023C")

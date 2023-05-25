@@ -51,17 +51,14 @@ for var in xVars:
     for index, eff in enumerate(effs): 
         xTitle = var
         yTitle = "Efficiency"
-        eff.GetXaxis().SetTitle(xTitle)
-        eff.GetYaxis().SetTitle(yTitle)
-        eff.SetLineColor(index+1)
-        eff.SetMaximum(1.2)
-        eff.SetMinimum(0.1)
-        #eff.SetMaximum(1.3*eff.GetMaximum())
+        decoHist(eff, xTitle, yTitle, index+1)
+        eff.SetMaximum(1.3)
+        eff.SetMinimum(0.2)
         if index==0:
-            eff.Draw("HIST")
+            eff.Draw("AP")
         else:
-            eff.Draw("hist same")
-        leg.AddEntry(eff, "%s"%(eff.GetName()), "L")
+            eff.Draw("Psame")
+        leg.AddEntry(eff, "%s"%(eff.GetName()), "APL")
     
     #Draw CMS, Lumi, channel
     extraText  = "Preliminary"
@@ -93,10 +90,12 @@ for var in xVars:
             decoHistRatio(hRatio, xTitle, "Ratio", index_+1)
             hRatio.GetYaxis().SetRangeUser(0.7, 1.3)
             if index_==0:
-                hRatio.Draw("HIST")
+                hRatio.Draw("AP")
             else:
-                hRatio.Draw("hist same")
+                hRatio.Draw("Psame")
             rLeg.AddEntry(hRatio, "%s"%(hRatio.GetName()), "L")
-        rLeg.Draw()
+        #rLeg.Draw()
     pdf = "/eos/uscms/%s/eff_%s.pdf"%(outPlotDir, var)
+    png = pdf.replace("pdf", "png")
     canvas.SaveAs(pdf)
+    canvas.SaveAs(png)

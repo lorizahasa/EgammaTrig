@@ -98,10 +98,10 @@ int main(int ac, char** av){
     //------------------------------------------
 	TH1D* hEvents  = new TH1D("hEvents", "#events in NanoAOD", 3, -1.5, 1.5);
     double etaBins[11]  = {-2.5,-2.0,-1.566,-1.4442, -0.8, 0.0, 0.8, 1.4442, 1.566, 2.0, 2.5};
-    double ptBins[8]   = {25,28,32,35,50,100,200,500};
-    TH1F *hPt       = new TH1F("probePt","probePt",7,ptBins);
-    TH1F *hPtPass   = new TH1F("probePtPass","probePtPass",7,ptBins);
-    TH1F *hPtFail   = new TH1F("probePtFail","probePtFail",7,ptBins);
+    double ptBins[9]   = {0,25,28,32,35,50,100,200,500};
+    TH1F *hPt       = new TH1F("probePt","probePt",8,ptBins);
+    TH1F *hPtPass   = new TH1F("probePtPass","probePtPass",8,ptBins);
+    TH1F *hPtFail   = new TH1F("probePtFail","probePtFail",8,ptBins);
     TH1F *hEta      = new TH1F("probeEta","probeEta",10,etaBins);
     TH1F *hEtaPass  = new TH1F("probeEtaPass","probeEtaPass",10,etaBins);
     TH1F *hEtaFail  = new TH1F("probeEtaFail","probeEtaFail",10,etaBins);
@@ -153,20 +153,20 @@ int main(int ac, char** av){
         bool probeMatch=selector->isTrigMatched(tree, e2);
 
         // Every event must have a tag electron matched with trigObj
-        if(!tagMatch) continue;
+        //if(!tagMatch) continue;
 
         // The fail and pass events are dicided by probMatch
         // All events
         hPt->Fill(tree->elePt[e2]);
-        hEta->Fill(tree->eleEta[e2],tree->elePt[e2]);
+        hEta->Fill(tree->eleEta[e2]);
         //passing probe
         if(probeMatch){
             hPtPass->Fill(tree->elePt[e2]);
-            hEtaPass->Fill(tree->eleEta[e2],tree->elePt[e2]);
+            hEtaPass->Fill(tree->eleEta[e2]);
         }
         else{//faling probe
             hPtFail->Fill(tree->elePt[e2]);
-            hEtaFail->Fill(tree->eleEta[e2],tree->elePt[e2]);
+            hEtaFail->Fill(tree->eleEta[e2]);
         }
 	}
 	hEvents->Write();

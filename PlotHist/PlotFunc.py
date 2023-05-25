@@ -1,7 +1,7 @@
 import ROOT as rt
 import numpy as np
 import sys
-import ctypes
+from ctypes import c_double
 
 #-----------------------------------------
 #Get, add, substract histograms 
@@ -10,12 +10,69 @@ def getEff(inFile, var, name):
     try:
         hPass = inFile.Get("probe%sPass"%var)
         hAll  = inFile.Get("probe%s"%var)
-        hEff_  = hPass.Clone("%s"%name)
-        hEff_.Divide(hAll)
     except Exception:
         print ("Error: Hist not found. \nFile: %s \nHistName: %s"%(inFile, hPath))
         sys.exit()
-    return hEff_
+    #if(rt.TEfficiency::CheckConsistency(hPass, hAll)):
+    hPass.GetXaxis().SetTitle(var)
+    #pEff = rt.TEfficiency(hPass, hAll)
+    pEff = rt.TGraphAsymmErrors(hPass, hAll)
+    pEff.SetName(name)
+    return pEff
+
+def getRatioTEff(eff1, eff2):
+    # Create a new TEfficiency object for the result
+    result = rt.TEfficiency(eff1.GetPassedHistogram(), eff1.GetTotalHistogram())
+
+    # Divide the numerator histograms
+    num1 = eff1.GetPassedHistogram()
+    num2 = eff2.GetPassedHistogram()
+    result.GetPassedHistogram().Divide(num1, num2, 1.0, 1.0, "B")
+
+    # Divide the denominator histograms
+    denom1 = eff1.GetTotalHistogram()
+    denom2 = eff2.GetTotalHistogram()
+    result.GetTotalHistogram().Divide(denom1, denom2, 1.0, 1.0, "B")
+
+    # Update the TEfficiency object with the divided histograms
+    result.CreateGraph()
+
+    return result
+
+
+def divideGraphs(graph1, graph2): #from ChatGPT
+    result_graph = rt.TGraphAsymmErrors()
+    # Loop over the points in graph1 and graph2
+    n_points = graph1.GetN()
+    for i in range(n_points):
+        # Get the values and errors for each point in graph1
+        x1 = c_double(0.0)
+        y1 = c_double(0.0)
+        exl1 = graph1.GetErrorXlow(i)
+        exh1 = graph1.GetErrorXhigh(i)
+        eyl1 = graph1.GetErrorYlow(i)
+        eyh1 = graph1.GetErrorYhigh(i)
+        graph1.GetPoint(i, x1, y1)
+
+        # Get the values and errors for the corresponding point in graph2
+        x2 = c_double(0.0)
+        y2 = c_double(0.0)
+        exl2 = graph2.GetErrorXlow(i)
+        exh2 = graph2.GetErrorXhigh(i)
+        eyl2 = graph2.GetErrorYlow(i)
+        eyh2 = graph2.GetErrorYhigh(i)
+        graph2.GetPoint(i, x2, y2)
+
+        # Perform the division of y values and errors
+        result_y = y1.value / y2.value if y2.value != 0 else 0.0
+        result_eyl = (eyl1 / y2.value) if y2.value != 0 else 0.0
+        result_eyh = (eyh1 / y2.value) if y2.value != 0 else 0.0
+        
+        # Set the values and errors to the result graph
+        result_graph.SetPoint(i, x1.value, result_y)
+        result_graph.SetPointError(i, exl1, exh1, result_eyl, result_eyh)
+    return result_graph
+
 
 #-----------------------------------------
 #Get ratio of two eff histograms
@@ -26,10 +83,11 @@ def getRatio(files, var):
     for name, f in files.items():
         names.append(name)
         effs.append(getEff(f, var, name))
-    rName  = "%s_vs_%s"%(names[0], names[1])
-    hRatio = effs[0].Clone(rName)
-    hRatio.Divide(effs[1])
-    return hRatio
+    rName  = "%s/%s"%(names[0], names[1])
+    ratio  = divideGraphs(effs[0], effs[1])
+    ratio.SetName(rName) 
+    return ratio
+
 
 #-----------------------------------------
 #Decorate a histogram
@@ -38,11 +96,13 @@ def decoHist(hist, xTit, yTit, color):
     hist.GetXaxis().SetTitle(xTit);
     hist.GetYaxis().SetTitle(yTit);
     hist.SetFillColor(color);
+    hist.SetLineColor(color);
+    hist.SetMarkerColor(color);
     hist.GetXaxis().SetTitle(xTit);
     hist.GetYaxis().SetTitle(yTit)
-    hist.GetYaxis().CenterTitle()
+    #hist.GetYaxis().CenterTitle()
     hist.GetXaxis().SetTitleOffset(1.0)
-    hist.GetYaxis().SetTitleOffset(1.0)
+    hist.GetYaxis().SetTitleOffset(1.2)
     hist.GetXaxis().SetTitleSize(0.05);
     hist.GetYaxis().SetTitleSize(0.05);
     hist.GetXaxis().SetTitleSize(0.05);
