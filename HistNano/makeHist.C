@@ -96,15 +96,18 @@ int main(int ac, char** av){
     //------------------------------------------
     // Declare histograms
     //------------------------------------------
+    //https://cmssdt.cern.ch/lxr/source/DQMOffline/Trigger/python/HLTEGTnPMonitor_cfi.py
 	TH1D* hEvents  = new TH1D("hEvents", "#events in NanoAOD", 3, -1.5, 1.5);
-    double etaBins[11]  = {-2.5,-2.0,-1.566,-1.4442, -0.8, 0.0, 0.8, 1.4442, 1.566, 2.0, 2.5};
-    double ptBins[9]   = {0,25,28,32,35,50,100,200,500};
-    TH1F *hPt       = new TH1F("probePt","probePt",8,ptBins);
-    TH1F *hPtPass   = new TH1F("probePtPass","probePtPass",8,ptBins);
-    TH1F *hPtFail   = new TH1F("probePtFail","probePtFail",8,ptBins);
-    TH1F *hEta      = new TH1F("probeEta","probeEta",10,etaBins);
-    TH1F *hEtaPass  = new TH1F("probeEtaPass","probeEtaPass",10,etaBins);
-    TH1F *hEtaFail  = new TH1F("probeEtaFail","probeEtaFail",10,etaBins);
+    const int ptN  = 22;
+    const int etaN = 49;
+    double ptBins[ptN]    = {5,10,12.5,15,17.5,20,22.5,25,30,35,40,45,50,60,80,100,150,200,250,300,350,400};
+    double etaBins[etaN]  = {-2.5,-2.4,-2.3,-2.2,-2.1,-2.0,-1.9,-1.8,-1.7,-1.566,-1.4442,-1.3,-1.2,-1.1,-1.0,-0.9,-0.8,-0.7,-0.6,-0.5,-0.4,-0.3,-0.2,-0.1,0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1,1.1,1.2,1.3,1.4442,1.566,1.7,1.8,1.9,2.0,2.1,2.2,2.3,2.4,2.5};
+    TH1F *hPt       = new TH1F("probePt","probePt",ptN-1,ptBins);
+    TH1F *hPtPass   = new TH1F("probePtPass","probePtPass",ptN-1,ptBins);
+    TH1F *hPtFail   = new TH1F("probePtFail","probePtFail",ptN-1,ptBins);
+    TH1F *hEta      = new TH1F("probeEta","probeEta",etaN-1,etaBins);
+    TH1F *hEtaPass  = new TH1F("probeEtaPass","probeEtaPass",etaN-1,etaBins);
+    TH1F *hEtaFail  = new TH1F("probeEtaFail","probeEtaFail",etaN-1,etaBins);
 
     //------------------------------------------
     // Loop over the events of tree 
@@ -149,18 +152,17 @@ int main(int ac, char** av){
         int ind1 = (ind0+1)%2;
         int e1   = selEles[ind0];
         int e2   = selEles[ind1];
-        bool tagMatch=selector->isTrigMatched(tree, e1);
-        bool probeMatch=selector->isTrigMatched(tree, e2);
+        vector<int> matchedTnP =selector->matchedTrig(tree, e1, e2);
 
         // Every event must have a tag electron matched with trigObj
-        //if(!tagMatch) continue;
+        if(matchedTnP.size()==0) continue;
 
         // The fail and pass events are dicided by probMatch
         // All events
         hPt->Fill(tree->elePt[e2]);
         hEta->Fill(tree->eleEta[e2]);
         //passing probe
-        if(probeMatch){
+        if(matchedTnP.size()==2){
             hPtPass->Fill(tree->elePt[e2]);
             hEtaPass->Fill(tree->eleEta[e2]);
         }

@@ -27,17 +27,17 @@ class EventTree{
     
     // variables
     // for 2022G 
+    /*
     UInt_t          nEle;
     Int_t           eleID[100];
     UInt_t          nTrigObj;
     Int_t           TrigObj_id[100];   
+    */
     // for 2023C 
-    /*
     Int_t           nEle;
     UChar_t         eleID[100];
     Int_t           nTrigObj;
     UShort_t        TrigObj_id[100];   
-    */
 
 
     Float_t         elePhi[100];

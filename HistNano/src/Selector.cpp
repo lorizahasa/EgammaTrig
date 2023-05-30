@@ -13,7 +13,7 @@ std::vector<int> Selector::filter_electrons(EventTree *tree){
         //select electrons
         bool eleSel = (passEtaEBEEGap && 
                        absEta <= 2.5 &&
-                       pt >= 32.0 &&
+                       pt >= 31.0 &&
                        passTightID);
         if(eleSel) selEles_.push_back(eleInd);
     }
@@ -48,15 +48,41 @@ bool Selector::filter_Z(EventTree *tree, vector<int> selEles__){
     return passZ;
 }
 
-bool Selector::isTrigMatched(EventTree *tree, int ind){
-    bool isMatch=false;
+// the tag and probe should match to two different tribObj
+// We first match the tag and then exclude the corresponding trigObj while
+// matching with the probe
+vector<int> Selector::matchedTrig(EventTree *tree, int e1, int e2){
+    std::vector<int> matched;
+    // match tag with one trigObj
+    double dR = 0.1;
+    int tagTrigIndex = -1;
     for(int j=0;j<tree->nTrigObj;j++){
-        double dR = deltaR(tree->eleEta[ind],  tree->elePhi[ind], tree->TrigObj_eta[j], tree->TrigObj_phi[j]);
-        // filterbit 2 is for hltEle32WPTightGsfTrackIsoFilter (of HLT_ELe32_WPTight_Gsf) 
+        if (!(tree->TrigObj_pt[j]>31)) continue;
+        if (!(abs(tree->TrigObj_id[j])==11)) continue;
+        if (!(tree->TrigObj_filterBits[j] & 1)) continue;
+        double dR_ = deltaR(tree->eleEta[e1],  tree->elePhi[e1], tree->TrigObj_eta[j], tree->TrigObj_phi[j]);
         //std::cout<<ind<<", "<<dR<<", "<<tree->TrigObj_pt[j]<<", "<<abs(tree->TrigObj_id[j])<<", "<<tree->TrigObj_filterBits[j]<<std::endl;
-        if(dR <0.1 && tree->TrigObj_pt[j]>32 && abs(tree->TrigObj_id[j])==11  && (tree->TrigObj_filterBits[j] & 1)) isMatch = true; 
+        if(dR_ < dR){
+            dR = dR_;
+            tagTrigIndex = j;
+        }
     }
-    return isMatch;
+    // match probe with trigObj
+    if(tagTrigIndex > -1){
+        matched.push_back(tagTrigIndex);
+        for(int j=0;j<tree->nTrigObj;j++){
+            if (!(tree->TrigObj_pt[j]>31)) continue;
+            if (!(abs(tree->TrigObj_id[j])==11)) continue;
+            if (!(tree->TrigObj_filterBits[j] & 1)) continue;
+            if (j==tagTrigIndex) continue;// exclude tag
+            double dR2 = deltaR(tree->eleEta[e2],  tree->elePhi[e2], tree->TrigObj_eta[j], tree->TrigObj_phi[j]);
+            if(dR2 < 0.1){
+                matched.push_back(j);
+                break;
+            }
+        }
+    }
+    return matched;
 }
 
 

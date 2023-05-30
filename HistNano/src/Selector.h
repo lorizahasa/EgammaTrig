@@ -17,7 +17,7 @@ class Selector{
 public:
 	Selector();
 	~Selector();
-    bool isTrigMatched (EventTree *tree, int ind);
+    vector<int> matchedTrig (EventTree *tree, int e1, int e2);
     std::vector<int> filter_electrons(EventTree *tree);
     bool filter_Z(EventTree *tree, vector<int> selEles__);
 

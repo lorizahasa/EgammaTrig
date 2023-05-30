@@ -20,26 +20,6 @@ def getEff(inFile, var, name):
     pEff.SetName(name)
     return pEff
 
-def getRatioTEff(eff1, eff2):
-    # Create a new TEfficiency object for the result
-    result = rt.TEfficiency(eff1.GetPassedHistogram(), eff1.GetTotalHistogram())
-
-    # Divide the numerator histograms
-    num1 = eff1.GetPassedHistogram()
-    num2 = eff2.GetPassedHistogram()
-    result.GetPassedHistogram().Divide(num1, num2, 1.0, 1.0, "B")
-
-    # Divide the denominator histograms
-    denom1 = eff1.GetTotalHistogram()
-    denom2 = eff2.GetTotalHistogram()
-    result.GetTotalHistogram().Divide(denom1, denom2, 1.0, 1.0, "B")
-
-    # Update the TEfficiency object with the divided histograms
-    result.CreateGraph()
-
-    return result
-
-
 def divideGraphs(graph1, graph2): #from ChatGPT
     result_graph = rt.TGraphAsymmErrors()
     # Loop over the points in graph1 and graph2

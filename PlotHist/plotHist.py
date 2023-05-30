@@ -35,9 +35,11 @@ for var in xVars:
 
     #get files
     files = {}
-    for samp in forOverlay:
-        inFile = TFile.Open("/eos/uscms/%s/merged/%s_Hist.root"%(outDir, samp))
-        files[samp] = inFile
+    for dirSamp in forOverlay:
+        dirH = dirSamp.split("/")[0]
+        samp = dirSamp.split("/")[1]
+        inFile = TFile.Open("/eos/uscms/%s/%s/merged/%s_Hist.root"%(eosDir, dirH, samp))
+        files["%s__%s"%(dirH, samp)] = inFile
 
     #get effs 
     effs = []
@@ -46,7 +48,7 @@ for var in xVars:
         effs.append(eff)
 
     #plot effs
-    leg = TLegend(0.55,0.40,0.95,0.50); 
+    leg = TLegend(0.45,0.40,0.85,0.50); 
     decoLegend(leg, 4, 0.030)
     for index, eff in enumerate(effs): 
         xTitle = var
@@ -58,7 +60,8 @@ for var in xVars:
             eff.Draw("AP")
         else:
             eff.Draw("Psame")
-        leg.AddEntry(eff, "%s"%(eff.GetName()), "APL")
+        leg.AddEntry(eff, "%s"%(eff.GetName().replace("HistNano_", "")), "APL")
+        #leg.AddEntry(eff, "%s"%(eff.GetName()), "APL")
     
     #Draw CMS, Lumi, channel
     extraText  = "Preliminary"
@@ -83,9 +86,11 @@ for var in xVars:
         #baseLine.Draw()
         for index_, two in enumerate(forRatio):
             files = {}
-            for samp in two:
-                inFile = TFile.Open("/eos/uscms/%s/merged/%s_Hist.root"%(outDir, samp))
-                files[samp] = inFile
+            for dirSamp in two:
+                dirH = dirSamp.split("/")[0]
+                samp = dirSamp.split("/")[1]
+                inFile = TFile.Open("/eos/uscms/%s/%s/merged/%s_Hist.root"%(eosDir, dirH, samp))
+                files["%s__%s"%(dirH, samp)] = inFile
             hRatio = getRatio(files, var)
             decoHistRatio(hRatio, xTitle, "Ratio", index_+1)
             hRatio.GetYaxis().SetRangeUser(0.7, 1.3)
