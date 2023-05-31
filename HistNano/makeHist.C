@@ -97,17 +97,15 @@ int main(int ac, char** av){
     // Declare histograms
     //------------------------------------------
     //https://cmssdt.cern.ch/lxr/source/DQMOffline/Trigger/python/HLTEGTnPMonitor_cfi.py
-	TH1D* hEvents  = new TH1D("hEvents", "#events in NanoAOD", 3, -1.5, 1.5);
+	TH1D* hEvents  = new TH1D("hEvents", "events in NanoAOD", 3, -1.5, 1.5);
     const int ptN  = 22;
     const int etaN = 49;
     double ptBins[ptN]    = {5,10,12.5,15,17.5,20,22.5,25,30,35,40,45,50,60,80,100,150,200,250,300,350,400};
     double etaBins[etaN]  = {-2.5,-2.4,-2.3,-2.2,-2.1,-2.0,-1.9,-1.8,-1.7,-1.566,-1.4442,-1.3,-1.2,-1.1,-1.0,-0.9,-0.8,-0.7,-0.6,-0.5,-0.4,-0.3,-0.2,-0.1,0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1,1.1,1.2,1.3,1.4442,1.566,1.7,1.8,1.9,2.0,2.1,2.2,2.3,2.4,2.5};
     TH1F *hPt       = new TH1F("probePt","probePt",ptN-1,ptBins);
     TH1F *hPtPass   = new TH1F("probePtPass","probePtPass",ptN-1,ptBins);
-    TH1F *hPtFail   = new TH1F("probePtFail","probePtFail",ptN-1,ptBins);
     TH1F *hEta      = new TH1F("probeEta","probeEta",etaN-1,etaBins);
     TH1F *hEtaPass  = new TH1F("probeEtaPass","probeEtaPass",etaN-1,etaBins);
-    TH1F *hEtaFail  = new TH1F("probeEtaFail","probeEtaFail",etaN-1,etaBins);
 
     //------------------------------------------
     // Loop over the events of tree 
@@ -143,41 +141,42 @@ int main(int ac, char** av){
 
         // Apply dilepton selection 
         std::vector<int> selEles = selector->filter_electrons(tree);
-        bool passZSel = selector->filter_Z(tree, selEles);
-        if(!passZSel) continue;
-        if(tree->nTrigObj < 2) continue;
-
-        // Randomly we chose electrons out of two and do matching with trigObj
-        int ind0 = rand()%2;
-        int ind1 = (ind0+1)%2;
-        int e1   = selEles[ind0];
-        int e2   = selEles[ind1];
-        vector<int> matchedTnP =selector->matchedTrig(tree, e1, e2);
-
-        // Every event must have a tag electron matched with trigObj
-        if(matchedTnP.size()==0) continue;
-
-        // The fail and pass events are dicided by probMatch
-        // All events
-        hPt->Fill(tree->elePt[e2]);
-        hEta->Fill(tree->eleEta[e2]);
-        //passing probe
-        if(matchedTnP.size()==2){
-            hPtPass->Fill(tree->elePt[e2]);
-            hEtaPass->Fill(tree->eleEta[e2]);
+        
+        //Assign electrons for tags and probe with eta, pT, ID cuts
+        std::vector<int> eleForTag   = selector->filter_electrons(tree);
+        std::vector<int> eleForProbe = eleForTag;
+        
+        //Apply additional trigger matching cut on tags
+        std::vector<int> trigMatchedTag;
+        for (int i=0; i<eleForTag.size(); i++){
+            int tag = eleForTag.at(i);
+            if(selector->isTrigMatched(tree, tag)) trigMatchedTag.push_back(tag);
         }
-        else{//faling probe
-            hPtFail->Fill(tree->elePt[e2]);
-            hEtaFail->Fill(tree->eleEta[e2]);
-        }
+
+        //Loop over all tags and probes
+        for (int j=0; j<trigMatchedTag.size(); j++){
+            for (int k=0; k<eleForProbe.size(); k++){
+                int t = trigMatchedTag.at(j);
+                int p = eleForProbe.at(k);
+                if(t==p) continue;
+                double dR    = selector->deltaR(tree->eleEta[t], tree->elePhi[t], tree->eleEta[p], tree->elePhi[p]);
+                bool isZ     = selector->filter_Z(tree, t, p);
+                if(dR >0.0 && isZ){
+                    hPt->Fill(tree->elePt[p]);
+                    hEta->Fill(tree->eleEta[p]);
+                    if(selector->isTrigMatched(tree, p)){
+                        hPtPass->Fill(tree->elePt[p]);
+                        hEtaPass->Fill(tree->eleEta[p]);
+                   }//trig matching probes
+                }//all probes
+            }//loop over probes
+        }//loop over tags
 	}
 	hEvents->Write();
     hPt->Write();  
     hPtPass->Write();  
-    hPtFail->Write();  
     hEta->Write();     
     hEtaPass->Write(); 
-    hEtaFail->Write();
 	outFile->Close();
     return 0;
 }
