@@ -10,7 +10,8 @@ std::vector<int> Selector::filter_electrons(EventTree *tree){
         double pt = tree->elePt[eleInd];
         bool passEtaEBEEGap = (absEta < 1.4442) || (absEta > 1.566);
         bool passTightID = (tree->eleID[eleInd] ==4);
-        bool eleSel = (passEtaEBEEGap && 
+        bool eleSel = (passEtaEBEEGap &&
+                       pt > 31 &&
                        absEta <= 2.5 &&
                        passTightID);
         if(eleSel) selEles_.push_back(eleInd);
@@ -39,9 +40,11 @@ bool Selector::filter_Z(EventTree *tree, int t, int p){
 bool Selector::isTrigMatched(EventTree *tree, int e){
     bool isTM = false;
     for(int j=0;j<tree->nTrigObj;j++){
-        if (!(tree->TrigObj_pt[j]>29)) continue;
+        if (!(tree->TrigObj_pt[j]>31)) continue;
         if (!(abs(tree->TrigObj_id[j])==11)) continue;
-        if (!(tree->TrigObj_filterBits[j] & 1)) continue;
+        if (!(tree->TrigObj_filterBits[j] & (0x1 << 1))) continue;
+        // 0x1 << 1 = 2. The filterbit for HLT_Ele32WPTight is 2
+        //  1 is serial number in NanoAODv11
         double dR = deltaR(tree->eleEta[e],  tree->elePhi[e], tree->TrigObj_eta[j], tree->TrigObj_phi[j]);
         if(dR < 0.1){
             isTM = true;

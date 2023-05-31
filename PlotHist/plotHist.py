@@ -30,6 +30,7 @@ for var in xVars:
         gPad.SetBottomMargin(padGap);
         #gPad.SetTickx(0);
         gPad.RedrawAxis();
+        gPad.SetLogx(True)
     else:
         canvas.cd()
 
@@ -48,14 +49,15 @@ for var in xVars:
         effs.append(eff)
 
     #plot effs
-    leg = TLegend(0.45,0.40,0.85,0.50); 
-    decoLegend(leg, 4, 0.030)
+    leg = TLegend(0.25,0.85,0.95,0.92); 
+    decoLegend(leg, 4, 0.027)
     for index, eff in enumerate(effs): 
         xTitle = var
         yTitle = "Efficiency"
         decoHist(eff, xTitle, yTitle, index+1)
         eff.SetMaximum(1.3)
         eff.SetMinimum(0.2)
+        eff.GetXaxis().SetRangeUser(10, 400)
         if index==0:
             eff.Draw("AP")
         else:
@@ -76,6 +78,7 @@ for var in xVars:
         gPad.SetTopMargin(padGap); 
         gPad.SetBottomMargin(0.30); 
         gPad.SetRightMargin(0.03);
+        gPad.SetLogx(True)
         #gPad.SetTickx(0);
         gPad.SetPad(xPadRange[0],yPadRange[0],xPadRange[1],yPadRange[2]);
         gPad.RedrawAxis();
@@ -94,6 +97,7 @@ for var in xVars:
             hRatio = getRatio(files, var)
             decoHistRatio(hRatio, xTitle, "Ratio", index_+1)
             hRatio.GetYaxis().SetRangeUser(0.7, 1.3)
+            hRatio.GetXaxis().SetRangeUser(10, 400)
             if index_==0:
                 hRatio.Draw("AP")
             else:

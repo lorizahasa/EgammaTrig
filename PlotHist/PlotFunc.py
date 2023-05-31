@@ -87,6 +87,7 @@ def decoHist(hist, xTit, yTit, color):
     hist.GetYaxis().SetTitleSize(0.05);
     hist.GetXaxis().SetTitleSize(0.05);
     hist.GetYaxis().SetTitleSize(0.05);
+    hist.GetXaxis().SetTickLength(0.04);
 
 def decoHistRatio(hist, xTit, yTit, color):
     #hist.SetFillColor(color);
@@ -109,7 +110,7 @@ def decoHistRatio(hist, xTit, yTit, color):
     hist.GetYaxis().SetLabelFont(42);
     #hist.GetYaxis().SetAxisColor(1);
     hist.GetYaxis().SetNdivisions(6,5,0);
-    #hist.GetXaxis().SetTickLength(0.06);
+    hist.GetXaxis().SetTickLength(0.08);
     hist.GetYaxis().SetTitleOffset(0.6);
     hist.GetYaxis().SetLabelOffset(0.01);
     hist.GetYaxis().CenterTitle();

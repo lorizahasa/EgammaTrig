@@ -139,9 +139,6 @@ int main(int ac, char** av){
 		tree->GetEntry(entry);
 		hEvents->Fill(0.);
 
-        // Apply dilepton selection 
-        std::vector<int> selEles = selector->filter_electrons(tree);
-        
         //Assign electrons for tags and probe with eta, pT, ID cuts
         std::vector<int> eleForTag   = selector->filter_electrons(tree);
         std::vector<int> eleForProbe = eleForTag;
