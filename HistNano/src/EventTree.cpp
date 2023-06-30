@@ -48,9 +48,11 @@ EventTree::EventTree(int nFiles, bool xRootDAccess, string year, char** fileName
 	
     // event
     chain->SetBranchStatus("run",1);
+    chain->SetBranchAddress("run", &run_);
     chain->SetBranchStatus("event",1);
+    chain->SetBranchAddress("event", &event_);
     chain->SetBranchStatus("luminosityBlock",1);
-
+    chain->SetBranchAddress("luminosityBlock", &lumis_);
 
     // electrons    
     chain->SetBranchStatus("nElectron",1);

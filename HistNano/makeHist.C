@@ -9,6 +9,7 @@
 
 #include "src/EventTree.h"
 #include "src/Selector.h"
+#include "src/LumiMask.h"
 
 int main(int ac, char** av){
 	if(ac < 3){
@@ -126,6 +127,13 @@ int main(int ac, char** av){
 	auto startClock = std::chrono::high_resolution_clock::now();
     double totalTime = 0.0;
     std::cout<<setw(10)<<"Progress"<<setw(10)<<"Time"<<std::endl;
+    int count_BadLumi=0;
+
+    std::map<std::string, string> lumiJSON;
+    lumiJSON["2022G"]       = "json/Cert_Collisions2023_eraC_367095_368224_Golden.json";
+    lumiJSON["2023C"]       = "json/Cert_Collisions2023_eraC_367095_368224_Golden.json";
+    LumiMask* lumiMask  = new LumiMask(lumiJSON[year]);
+
 	for(Long64_t entry= startEntry; entry < endEntry; entry++){
         //if(entry>10000) break; 
         // Print time after 1% events are processed
@@ -137,6 +145,11 @@ int main(int ac, char** av){
 			startClock = std::chrono::high_resolution_clock::now();			
 		}
 		tree->GetEntry(entry);
+        bool valLumi = lumiMask->isValidLumi(tree->run_, tree->lumis_);
+        if(!valLumi){
+            count_BadLumi++;
+            continue;
+        }
 		hEvents->Fill(0.);
 
         //Assign electrons for tags and probe with eta, pT, ID cuts
@@ -169,6 +182,7 @@ int main(int ac, char** av){
             }//loop over probes
         }//loop over tags
 	}
+    cout<<"Total events masked = "<<count_BadLumi<<endl;
 	hEvents->Write();
     hPt->Write();  
     hPtPass->Write();  
