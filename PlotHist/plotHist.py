@@ -30,7 +30,8 @@ for var in xVars:
         gPad.SetBottomMargin(padGap);
         #gPad.SetTickx(0);
         gPad.RedrawAxis();
-        gPad.SetLogx(True)
+        if("Pt") in var:
+            gPad.SetLogx(True)
     else:
         canvas.cd()
 
@@ -41,6 +42,7 @@ for var in xVars:
         samp = dirSamp.split("/")[1]
         inFile = TFile.Open("/eos/uscms/%s/%s/merged/%s_Hist.root"%(eosDir, dirH, samp))
         files["%s__%s"%(dirH, samp)] = inFile
+        print(inFile)
 
     #get effs 
     effs = []
@@ -78,7 +80,8 @@ for var in xVars:
         gPad.SetTopMargin(padGap); 
         gPad.SetBottomMargin(0.30); 
         gPad.SetRightMargin(0.03);
-        gPad.SetLogx(True)
+        if("Pt") in var:
+            gPad.SetLogx(True)
         #gPad.SetTickx(0);
         gPad.SetPad(xPadRange[0],yPadRange[0],xPadRange[1],yPadRange[2]);
         gPad.RedrawAxis();

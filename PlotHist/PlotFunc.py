@@ -88,6 +88,8 @@ def decoHist(hist, xTit, yTit, color):
     hist.GetXaxis().SetTitleSize(0.05);
     hist.GetYaxis().SetTitleSize(0.05);
     hist.GetXaxis().SetTickLength(0.04);
+    hist.GetXaxis().SetMoreLogLabels();
+    hist.GetXaxis().SetNoExponent()
 
 def decoHistRatio(hist, xTit, yTit, color):
     #hist.SetFillColor(color);
@@ -113,7 +115,9 @@ def decoHistRatio(hist, xTit, yTit, color):
     hist.GetXaxis().SetTickLength(0.08);
     hist.GetYaxis().SetTitleOffset(0.6);
     hist.GetYaxis().SetLabelOffset(0.01);
+    hist.GetXaxis().SetMoreLogLabels()
     hist.GetYaxis().CenterTitle();
+    hist.GetXaxis().SetNoExponent()
 
 #-----------------------------------------
 #Legends for all histograms, graphs
@@ -130,7 +134,7 @@ def decoLegend(legend, nCol, textSize):
     return legend
 
 def getLumiLabel(year):
-    lumi = "X fb^{-1}"
+    lumi = "2022G vs 2023C fb^{-1}"
     if "16Pre" in year:
         lumi = "19.5 fb^{-1} (2016Pre)"
     if "16Post" in year:

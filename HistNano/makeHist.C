@@ -98,9 +98,9 @@ int main(int ac, char** av){
     //------------------------------------------
     //https://cmssdt.cern.ch/lxr/source/DQMOffline/Trigger/python/HLTEGTnPMonitor_cfi.py
 	TH1D* hEvents  = new TH1D("hEvents", "events in NanoAOD", 3, -1.5, 1.5);
-    const int ptN  = 22;
+    const int ptN  = 21;
     const int etaN = 49;
-    double ptBins[ptN]    = {5,10,12.5,15,17.5,20,22.5,25,30,35,40,45,50,60,80,100,150,200,250,300,350,400};
+    double ptBins[ptN]    = {5,10,15,20,22,26,28,30,32,34,36,38,40,45,50,60,80,100,150,250,400};
     double etaBins[etaN]  = {-2.5,-2.4,-2.3,-2.2,-2.1,-2.0,-1.9,-1.8,-1.7,-1.566,-1.4442,-1.3,-1.2,-1.1,-1.0,-0.9,-0.8,-0.7,-0.6,-0.5,-0.4,-0.3,-0.2,-0.1,0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1,1.1,1.2,1.3,1.4442,1.566,1.7,1.8,1.9,2.0,2.1,2.2,2.3,2.4,2.5};
     TH1F *hPt       = new TH1F("probePt","probePt",ptN-1,ptBins);
     TH1F *hPtPass   = new TH1F("probePtPass","probePtPass",ptN-1,ptBins);
