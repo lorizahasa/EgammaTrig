@@ -9,14 +9,16 @@ sys.path.insert(0, os.getcwd().replace("HistNano/condor",""))
 from Inputs import *
 from JobsNano_cff import * 
 
-if not os.path.exists("tmpSub/log"):
-    os.makedirs("tmpSub/log")
+if os.path.exists("tmpSub"):
+    os.system("rm -r tmpSub")
+    print("Deleted dir: tmpSub")
+os.system("mkdir -p tmpSub/log")
+print("Created dir: tmpSub")
 condorLogDir = "log"
 tarFile = "tmpSub/EgammaNanoTnP.tar.gz"
 if os.path.exists(tarFile):
 	os.system("rm %s"%tarFile)
-os.system("tar --exclude=../../../EgammaNanoTnP/.git/ -zcvf %s  ../../../EgammaNanoTnP "%tarFile)
-#os.system("tar -zcvf %s --exclude=../../../EgammaNanoTnP/.git/ --exclude=../../HistNano/condor ../../../EgammaNanoTnP "%tarFile)
+os.system("tar -zcvf %s  ../../../EgammaNanoTnP --exclude=.git --exclude=condor"%tarFile)
 os.system("cp runMakeHist.sh tmpSub/")
 common_command = \
 'Universe   = vanilla\n\

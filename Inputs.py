@@ -5,7 +5,7 @@ eosDir  ="/store/user/lpctop/Output/EgammaNanoTnP"
 #---------------
 # Histogramming
 #---------------
-outDir  = "%s/%s"%(eosDir, "HLT_Ele32_WPTight_Gsf")
+outDir  = "%s/%s"%(eosDir, "HLT_Ele32_WPTight_Gsf_v3")
 # for condor jobs
 samples = {}
 #samples["EGamma_Run2022G"]  = "/EGamma/Run2022G-PromptNanoAODv11_v1-v2/NANOAOD"
