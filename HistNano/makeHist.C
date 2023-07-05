@@ -129,7 +129,7 @@ int main(int ac, char** av){
     std::cout<<setw(10)<<"Progress"<<setw(10)<<"Time"<<std::endl;
     int count_BadLumi=0;
 
-    std::string lumiJSON = "json/Cert_Collisions2023_eraC_367095_368224_Golden.json"
+    std::string lumiJSON = "json/Cert_Collisions2023_366442_368823_Golden.json";
     LumiMask* lumiMask   = new LumiMask(lumiJSON);
 
 	for(Long64_t entry= startEntry; entry < endEntry; entry++){
