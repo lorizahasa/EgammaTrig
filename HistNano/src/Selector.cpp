@@ -11,12 +11,37 @@ std::vector<int> Selector::filter_electrons(EventTree *tree){
         bool passEtaEBEEGap = (absEta < 1.4442) || (absEta > 1.566);
         bool passTightID = (tree->eleID[eleInd] ==4);
         bool eleSel = (passEtaEBEEGap &&
-                       pt > 31 &&
-                       absEta <= 2.5 &&
+                       pt > 40 &&
+                       absEta <= 2.4 &&
                        passTightID);
         if(eleSel) selEles_.push_back(eleInd);
     }
     return selEles_;
+}
+
+std::vector<int> Selector::filter_muons(EventTree *tree){
+    std::vector<int>selMuons_;
+    for(UInt_t m = 0; m < tree->nMuon; ++m){
+        double eta = tree->muEta[m];
+        double pt = tree->muPt[m];
+        //cout<<"Muons before Sel: "<< m <<endl;
+        //Prompt muon (Medium ID)
+        //cutbased for pt<=120, highPt for pt >120
+        bool passPrompt     = false;
+        if(pt > 55){
+            passPrompt = (TMath::Abs(eta) <= 2.4
+                && (int)tree->muTkIsoId[m] == 2 //1 for loose, 2 for tight
+                &&  tree->muHighPurity[m]
+                && (int)tree->muHighPtId[m]==2//1 = tracker high pT, 2 = global high pT, which includes tracker high pT
+                && tree->muDxy[m]<0.2
+                && tree->muDz[m]<0.5);
+        }
+        if(passPrompt){ 
+            selMuons_.push_back(m);
+            //cout<< "Passed Muon Sel: "<< selMuons_.size()<<endl;
+        }
+            }
+    return selMuons_;
 }
 
 bool Selector::filter_Z(EventTree *tree, int t, int p){
@@ -37,6 +62,7 @@ bool Selector::filter_Z(EventTree *tree, int t, int p){
     return passZ;
 }
 
+/*
 bool Selector::isTrigMatched(EventTree *tree, int e){
     bool isTM = false;
     for(int j=0;j<tree->nTrigObj;j++){
@@ -53,6 +79,7 @@ bool Selector::isTrigMatched(EventTree *tree, int e){
     }
     return isTM;
 }
+*/
 
 Selector::~Selector(){
 }

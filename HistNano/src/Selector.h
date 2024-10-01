@@ -19,6 +19,7 @@ public:
 	~Selector();
     bool isTrigMatched(EventTree *tree, int e);
     std::vector<int> filter_electrons(EventTree *tree);
+    std::vector<int> filter_muons(EventTree *tree);
     bool filter_Z(EventTree *tree, int t, int p); 
 
     //delta R

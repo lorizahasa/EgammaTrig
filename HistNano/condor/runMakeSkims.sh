@@ -13,27 +13,28 @@ else
     echo "Running In Batch"
     echo ${_CONDOR_SCRATCH_DIR}
     source /cvmfs/cms.cern.ch/cmsset_default.sh
-    export SCRAM_ARCH=slc7_amd64_gcc700
-    scramv1 project CMSSW CMSSW_13_0_0 
-    cd CMSSW_13_0_0/src
+    #export SCRAM_ARCH=slc7_amd64_gcc700
+    scramv1 project CMSSW CMSSW_14_0_0
+    cd CMSSW_14_0_0/src
     eval `scramv1 runtime -sh`
     cd ../..
-	tar --strip-components=1 -zxf EgammaNanoTnP.tar.gz
+	tar --strip-components=1 -zxf EgammaTrig.tar.gz
 fi
 
 #Run for Base, Signal region
 echo "All arguements: "$@
 echo "Number of arguements: "$#
-sample=$1
-job=$2
-nJobTotal=$3
-outDir=$4
-varname=${sample}_FileList
+year=$1
+sample=$2
+job=$3
+nJobTotal=$4
+outDir=$5
+varname=${sample}_FileList_${year}
 source FilesNano_cff.sh
 cd HistNano
 jobNum="${job}of${nJobTotal}"
-echo "./makeHist ${jobNum} ${sample}_Hist.root ${!varname}"
-./makeHist 2010 $jobNum ${sample}_Hist.root ${!varname}
+echo "./makeHist ${year} ${jobNum} ${sample}_Skim.root ${!varname}"
+./makeHist ${year} $jobNum ${sample}_Skim.root ${!varname}
 
 printf "Done skimming at ";/bin/date
 #---------------------------------------------
@@ -42,7 +43,7 @@ printf "Done skimming at ";/bin/date
 if [ -z ${_CONDOR_SCRATCH_DIR} ] ; then
     echo "Running Interactively" ;
 else
-    xrdcp -f ${sample}_Hist_${jobNum}.root root://cmseos.fnal.gov/${outDir}
+    xrdcp -f ${sample}_Skim_${jobNum}.root root://cmseos.fnal.gov/${outDir}
     echo "Cleanup"
     rm -rf CMSSW*
     rm *.root 

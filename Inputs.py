@@ -1,11 +1,11 @@
 import sys
 sys.dont_write_bytecode = True
-eosDir  ="/store/user/lpctop/Output/EgammaNanoTnP"
+eosDir  ="/store/user/"
 
 #---------------
 # Histogramming
 #---------------
-outDir  = "%s/%s"%(eosDir, "HLT_Ele32_WPTight_Gsf_v3")
+outDir  = "%s/%s"%(eosDir, "ElectronTrig")
 # for condor jobs
 samples = {}
 #samples["EGamma_Run2022G"]  = "/EGamma/Run2022G-PromptNanoAODv11_v1-v2/NANOAOD"

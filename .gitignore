@@ -1,6 +1,9 @@
 FilesNano_cff.sh
 JobsNano_cff.py
 HistNano/*.root
+HistNano/*.pdf
+HistNano/plots/
 HistNano/condor/tmpSub/
 HistNano/src/*.o
 HistNano/makeHist
+HistNano/efficiency_calculator
